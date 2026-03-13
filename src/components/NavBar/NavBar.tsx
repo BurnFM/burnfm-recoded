@@ -85,7 +85,7 @@ export default function NavBar() {
       href: "/shows",
       label: "Shows",
       icon: LayoutGridIcon,
-      match: (p: string) => p.startsWith("/shows") || p.startsWith("/show"),
+      match: (p: string) => p.startsWith("/shows") || p.startsWith("/show") || p.startsWith("/podcast"),
     },
     {
       href: "/faq",

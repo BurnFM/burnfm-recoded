@@ -1,16 +1,17 @@
 import React from 'react';
-import {getAllShows} from "@/lib/api";
+import {getAllPodcasts, getAllShows, getSchedule} from "@/lib/api";
+import {IShow, IPodcast} from "@/lib/types";
 import Motion from "@/components/motion";
 import Link from "next/link";
 import Image from "next/image";
-import {ChevronRightIcon, RadioIcon} from "lucide-react";
+import {ChevronRightIcon, Podcast, RadioIcon} from "lucide-react";
 import {Metadata} from "next";
 
 export const metadata: Metadata = {
   title: 'Radio Shows - Burn FM',
 }
 
-const acceptableFilters = ["committee", "current", "previous"]
+const acceptableFilters = ["radio", "podcast", "committee", "current", "archive"]
 
 export const revalidate = 7200;
 
@@ -26,7 +27,26 @@ export default async function Page({searchParams}: { searchParams: Promise<{ [ke
     new_filter = filter.filter(item => acceptableFilters.includes(item));
   }
 
-  const shows = await getAllShows(new_filter);
+  type DisplayItem = (IShow & { type: string }) | (IPodcast & { type: string})
+
+  let display: DisplayItem[] = [];
+
+  if (!new_filter || new_filter.includes("radio")){
+    const shows = await getAllShows(new_filter);
+    display.push(...shows.map(show => ({...show, type:"radio"})));
+  }
+
+  if (!new_filter || new_filter.includes("podcast")){
+    const podcasts = await getAllPodcasts(new_filter);
+    display.push(...podcasts.map(podcast => ({...podcast, type:"podcast"})));
+  }
+
+  if (new_filter && new_filter.includes("current")){
+    const shows = await getSchedule();
+    display.push(...shows.map(show => ({...show, type:"radio"})));
+  }
+
+  display.sort((a, b) => a.title.localeCompare(b.title));
 
   return (
       <Motion
@@ -37,10 +57,10 @@ export default async function Page({searchParams}: { searchParams: Promise<{ [ke
           animate={{ opacity: 1 }}
       >
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
-          {shows.map((show, i) => (
+          {display.map((show, i) => (
               <Link
                   key={i}
-                  href={`/show/${show.id}`}
+                  href={show.type === "radio" ? `/show/${show.id}`:`/podcast/${show.id}`}
                   prefetch={false}
                   className="group relative h-[160px] flex max-sm:flex-row-reverse items-stretch bg-white  dark:bg-tertiary border border-alt-purple/30 overflow-hidden no-underline transition-colors duration-200 hover:bg-tertiary-hover active:bg-tertiary-active focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus-color"
               >
@@ -63,6 +83,7 @@ export default async function Page({searchParams}: { searchParams: Promise<{ [ke
                     <p className="text-sm text-foreground/70">Hosted by: {show.hosts.join(", ")}</p>
                     <div className="flex flex-col justify-center gap-1 w-full">
                       <h3 className="notranslate text-xl font-bold">{show.title}</h3>
+                      <p className="text-sm text-foreground/70">{(!new_filter) ? (show.type === "radio" ? "Radio Show":"Podcast"):""}</p>
                       {/*{show.description && (*/}
                       {/*    <p className="line-clamp-2 text-sm text-foreground/70">*/}
                       {/*      {show.description}*/}

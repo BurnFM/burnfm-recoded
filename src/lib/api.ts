@@ -201,7 +201,6 @@ export const getShow = cache(async (id: number): Promise<IShowExtended | null> =
 export const getPodcast = cache(async (id: number): Promise<IPodcast | null> => {
   try {
     const res = await fetchClient<{ time_zone: string; data: IPodcast }>(GET_PODCAST_ENDPOINT(id), { next: { revalidate: 3600 } });
-    console.log(res)
     return res.data;
   } catch (error: any) {
     if (error.response.status === 404) {
@@ -248,7 +247,6 @@ export async function getAllShows(filters?: string[]) {
 export async function getAllPodcasts(filters?: string[]) {
   try {
     const res = await fetchClient<{ time_zone: string; data: IPodcast[] }>(GET_PODCAST_ENDPOINT(), { next: { revalidate: 3600 } });
-    console.log(res)
     const podcasts = res.data.map(podcast => ({
       ...podcast,
       photo: podcast.photo ? "https://api.burnfm.com/uploads/schedule_img/" + podcast.photo : null,

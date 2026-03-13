@@ -39,6 +39,14 @@ export default async function Page({ params }: { params: Promise<{ podcast_id: s
 
   if (!podcast) return notFound();
 
+  function formatDate(dateString: string) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      month: "long",
+      year: "numeric",
+    });
+  }
+
   return (
       <Motion type={'div'}
               className={styles.root}
@@ -78,6 +86,18 @@ export default async function Page({ params }: { params: Promise<{ podcast_id: s
               <p className={styles.placeholderText}>This podcast has no description</p>
           }
         </div>
+
+        {podcast.startDate != "0000-00-00" ?
+          <div className={styles.details} style={{gap:"0px !important", paddingTop:"0px !important"}}>
+            <h2>Podcast running:</h2>
+            {podcast.endDate != "0000-00-00" ? 
+            <div>{formatDate(podcast.startDate)} to {formatDate(podcast.endDate)}</div>
+            :
+            <div>{formatDate(podcast.startDate)} to present</div>
+          }</div>
+          :
+          null
+        }
 
         <div className={styles.onDemand}>
           <h2>On demand</h2>

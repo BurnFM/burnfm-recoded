@@ -78,6 +78,7 @@ export default function ProfileCard({profile, priority, id}: {profile: Profile, 
                     allowFullScreen={false}
                     title={"Spotify player"}
                     loading="lazy"
+                    scrolling="no"
             />
           </div>
           : <></>

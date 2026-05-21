@@ -32,7 +32,7 @@ export default function CommitteeSection({committees}: {committees: {   start_ye
   return (
       <div className={styles.Team_Section}>
         <h2 className={styles.Header}>The Team</h2>
-        <PillTabBar className={styles.Selector} data={pillsData} onSelect={handlePillSelect} />
+        <PillTabBar className={styles.Selector} data={pillsData} onSelect={handlePillSelect}/>
         <Motion className={styles.ProfileGrid}
                 variants={variants}
                 initial={'hidden'}

@@ -134,8 +134,6 @@ export async function getCommittees() {
       photo: profile.photo ? "https://api.burnfm.com/uploads/committee_img/" + profile.photo : null,
     }));
 
-    console.log(profiles);
-
     return profiles
 
   } catch (error: any) {

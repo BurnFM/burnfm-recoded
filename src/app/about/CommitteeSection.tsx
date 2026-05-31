@@ -1,50 +1,66 @@
-"use client"
+"use client";
 
-import React, {useState} from 'react';
-import {Profile} from "@/lib/types";
+import React, { useState } from "react";
+import { Profile } from "@/lib/types";
 import styles from "@/app/about/about.module.css";
 import PillTabBar from "@/components/PillTabBar/PillTabBar";
 import ProfileCard from "@/components/ProfileCard/ProfileCard";
 import Motion from "@/components/motion";
-import {AnimatePresence} from "motion/react";
-import {Variants} from "motion";
+import HScroll from "@/components/HScroll/HScroll";
 
-export default function CommitteeSection({committees}: {committees: {   start_year: number,   profiles: Profile[] }[]}) {
-  const pillsData = committees.map(({start_year}, i) => {
-    const nextYear = (start_year + 1).toString().slice(-2); // e.g., 2024 -> "25"
-    const label = `${start_year}-${nextYear}`;
+type Props = { committees: Profile[] };
+
+// helper to normalize year everywhere
+const normalizeYear = (year: number) =>
+  year < 100 ? 2000 + year : year;
+
+export default function CommitteeSection({ committees }: Props) {
+  // normalize dataset once
+  const normalizedCommittees = committees.map((p) => ({
+    ...p,
+    year: normalizeYear(p.year),
+  }));
+
+  const years = Array.from(
+    new Set(normalizedCommittees.map((p) => p.year))
+  ).sort((a, b) => b - a);
+
+  const pillsData = years.map((year, i) => {
+    const nextYearShort = String((year + 1) % 100).padStart(2, "0");
+
     return {
       id: i,
-      text: label,
+      year,
+      text: `${year}-${nextYearShort}`,
     };
   });
 
-  const [committeeId, setCommitteeId] = useState(0);
+  const [selectedYear, setSelectedYear] = useState(years[0]);
 
   const handlePillSelect = (id: number) => {
-    setCommitteeId(id);
-  };
-
-  const variants: Variants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.4, type: 'tween' } },
+    setSelectedYear(pillsData[id].year);
   };
 
   return (
-      <div className={styles.Team_Section}>
-        <h2 className={styles.Header}>The Team</h2>
-        <PillTabBar className={styles.Selector} data={pillsData} onSelect={handlePillSelect}/>
-        <Motion className={styles.ProfileGrid}
-                variants={variants}
-                initial={'hidden'}
-                animate={'visible'}
-        >
-          { committees[committeeId].profiles.map((profile, i) =>
-              <AnimatePresence key={i}>
-                <ProfileCard profile={profile} priority={i < 3} id={`${committeeId} ${i}`} />
-              </AnimatePresence>
-          )}
-        </Motion>
-      </div>
+    <div className={styles.Team_Section}>
+      <h2 className={styles.Header}>The Team</h2>
+
+      <HScroll color={"rgba(0, 0, 0, 0)"} className={"-m-1"}>
+        <PillTabBar data={pillsData} onSelect={handlePillSelect} />
+      </HScroll>
+
+      <Motion className={styles.ProfileGrid}>
+        {normalizedCommittees
+          .filter((p) => p.year === selectedYear)
+          .map((profile, i) => (
+            <ProfileCard
+              key={`${profile.year}-${i}`}
+              profile={profile}
+              priority={i < 3}
+              id={`${selectedYear}-${i}`}
+            />
+          ))}
+      </Motion>
+    </div>
   );
 }

@@ -114,13 +114,15 @@ export type PopupState = {
 }
 
 export type Profile = {
+  id: number,
   name: string,
   role: string,
   course: string,
   description: string,
-  picture: string,
-  favourite_song: string,
-  fun_fact: string,
+  photo: string,
+  song: string,
+  fact: string,
+  year: number
 }
 
 export const days = [

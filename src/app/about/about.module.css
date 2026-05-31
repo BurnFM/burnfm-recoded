@@ -22,11 +22,6 @@
   color: white;
   margin-bottom: 16px;
 }
-
-.Selector {
-  margin-bottom: 8px;
-}
-
 .Rectangle {
   position: absolute;
   left: -250px;
@@ -67,6 +62,7 @@
 }
 
 .ProfileGrid {
+  padding-top: 8px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   justify-content: left;

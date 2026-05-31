@@ -17,4 +17,4 @@ export const GET_PODCAST_ENDPOINT = (id?: number) => {
 }
 
 export const SETTINGS_ENDPOINT = "https://api.burnfm.com/new/settings/get"
-export const COMMITTEE_FILES_ENDPOINT = "https://api.burnfm.com/committee/get-committee-history"
+export const COMMITTEE_FILES_ENDPOINT = "https://api.burnfm.com/new/committee/get"

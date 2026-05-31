@@ -128,24 +128,18 @@ function formShowObject(show: API_ShowExtended, time_zone: string): IShowExtende
 
 export async function getCommittees() {
   try {
-    const files = await fetchClient<string[]>(COMMITTEE_FILES_ENDPOINT, { next: { revalidate: 3600 } });
+    const res = await fetchClient<{ time_zone: string; data: Profile[] }>(COMMITTEE_FILES_ENDPOINT, { next: { revalidate: 3600 } });
+    const profiles = res.data.map(profile => ({
+      ...profile,
+      photo: profile.photo ? "https://api.burnfm.com/uploads/committee_img/" + profile.photo : null,
+    }));
 
-    const data: { start_year: number, profiles: Profile[] }[] = []
+    console.log(profiles);
 
-    for (const filename of files) {
-      const result = await axios.get<Profile[]>(COMMITTEE_ENDPOINT + `/${filename}`);
+    return profiles
 
-      data.push({
-        start_year: parseInt(filename.split('-')[0], 10),
-        profiles: result.data
-      });
-    }
-
-    // Extract the starting year from each filename (e.g., "2024-25.json" -> 2024)
-    return data.sort((a, b) => b.start_year - a.start_year);
-  } catch (error) {
-    console.error('Failed to fetch list of committee filenames:', error);
-    return [];
+  } catch (error: any) {
+    throw error;
   }
 }
 

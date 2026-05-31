@@ -8,5 +8,13 @@ export const GET_RADIOSHOW_ENDPOINT = (id?: number) => {
   else
     return "https://api.burnfm.com/new/radio_show/get";
 }
+
+export const GET_PODCAST_ENDPOINT = (id?: number) => {
+  if (id)
+    return "https://api.burnfm.com/new/podcast/get?id=" + id;
+  else
+    return "https://api.burnfm.com/new/podcast/get";
+}
+
 export const SETTINGS_ENDPOINT = "https://api.burnfm.com/new/settings/get"
 export const COMMITTEE_FILES_ENDPOINT = "https://api.burnfm.com/committee/get-committee-history"

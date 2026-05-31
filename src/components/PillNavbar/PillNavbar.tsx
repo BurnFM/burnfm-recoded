@@ -19,11 +19,20 @@ export default function PillNavbar({
   const checkParams = (p?: ParsedUrlQueryInput) => {
     if (!p) return params.size === 0;
 
-    for (const key in p) {
-      if (params.get(key) !== p[key]) {
-        return false;
-      }
+   for (const key in p) {
+    const expected = Array.isArray(p[key]) ? p[key] : [p[key]];
+    const actual = params.getAll(key);
+
+    if (expected.length !== actual.length) return false;
+
+    const expectedSorted = [...expected].map(String).sort();
+    const actualSorted = [...actual].sort();
+
+    for (let i = 0; i < expectedSorted.length; i++) {
+      if (expectedSorted[i] !== actualSorted[i]) return false;
     }
+  }
+
     return true;
   }
 

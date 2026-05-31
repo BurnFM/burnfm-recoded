@@ -1,6 +1,6 @@
 import {
   API_ScheduleItem,
-  API_ShowExtended, IShow,
+  API_ShowExtended, IPodcast, IShow,
   IShowExtended, Profile,
   Schedule_API,
   Settings_API,
@@ -10,6 +10,7 @@ import {
 import {
   COMMITTEE_ENDPOINT,
   COMMITTEE_FILES_ENDPOINT,
+  GET_PODCAST_ENDPOINT,
   GET_RADIOSHOW_ENDPOINT,
   NOW_PLAYING_ENDPOINT,
   SCHEDULE_ENDPOINT,
@@ -196,6 +197,19 @@ export const getShow = cache(async (id: number): Promise<IShowExtended | null> =
   }
 })
 
+// Retrieve a podcast from the API.
+export const getPodcast = cache(async (id: number): Promise<IPodcast | null> => {
+  try {
+    const res = await fetchClient<{ time_zone: string; data: IPodcast }>(GET_PODCAST_ENDPOINT(id), { next: { revalidate: 3600 } });
+    return res.data;
+  } catch (error: any) {
+    if (error.response.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+})
+
 // Retrieve all shows from the API.
 export async function getAllShows(filters?: string[]) {
   try {
@@ -203,7 +217,7 @@ export async function getAllShows(filters?: string[]) {
     const shows = res.data.map(show => ({
       ...show,
       photo: show.photo ? "https://api.burnfm.com/uploads/schedule_img/" + show.photo : null,
-    })).sort((a, b) => a.title > b.title ? 1 : -1);
+    }));
 
     // Define the predicates to apply
     const predicates: ((show: IShow) => boolean)[] = []
@@ -211,11 +225,44 @@ export async function getAllShows(filters?: string[]) {
       if (filters.includes("committee")) {
         predicates.push((show: IShow) => show.hosts.includes("Burn FM"))
       }
+
+      if(filters.includes("archive")){
+        const schedule = await getSchedule();
+        const currentShowsID = new Set(schedule.map(show => show.id));
+        predicates.push((show: IShow) => !currentShowsID.has(show.id))
+      }
     }
 
     // Apply each predicate for each show in list
     return shows.filter(show =>
         predicates.every(predicate => predicate(show))
+    );
+
+  } catch (error: any) {
+    throw error;
+  }
+}
+
+// Retrieve all podcasts from the API.
+export async function getAllPodcasts(filters?: string[]) {
+  try {
+    const res = await fetchClient<{ time_zone: string; data: IPodcast[] }>(GET_PODCAST_ENDPOINT(), { next: { revalidate: 3600 } });
+    const podcasts = res.data.map(podcast => ({
+      ...podcast,
+      photo: podcast.photo ? "https://api.burnfm.com/uploads/schedule_img/" + podcast.photo : null,
+    }));
+
+    // Define the predicates to apply
+    const predicates: ((podcast: IPodcast) => boolean)[] = []
+    if (filters) {
+      if (filters.includes("committee")) {
+        predicates.push((podcast: IPodcast) => podcast.hosts.includes("Burn FM"))
+      }
+    }
+
+    // Apply each predicate for each show in list
+    return podcasts.filter(podcast =>
+        predicates.every(predicate => predicate(podcast))
     );
 
   } catch (error: any) {

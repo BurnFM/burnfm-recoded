@@ -12,16 +12,18 @@ export default function Layout({children}: {children: React.ReactNode}) {
             initial={{opacity: 0}}
             animate={{opacity: 1}}>
         <div className={styles.headerSection}>
-          <h1 className={"text-white"}>Radio Shows</h1>
+          <h1 className={"text-white"}>Radio Shows & Podcasts</h1>
           <p className={"text-white mb-4"}>Discover all that Burn FM has to offer in the present... and the past.</p>
           <Suspense>
             <HScroll color={"rgba(93, 31, 116)"} className={"-m-1"}>
               <PillNavbar
                   data={[
                     { link: "/shows", text: "All shows" },
-                    { link: "/shows", text: "Committee Shows", params: {filter: "committee"}},
-                    // { link: "/shows", text: "Current Shows", params: {filter: "current"} },
-                    // { link: "/shows", text: "Past Shows", params: {filter: "previous"} }
+                    { link: "/shows", text: "All Radio shows", params: {filter: "radio"}},
+                    { link: "/shows", text: "All Podcasts", params: {filter: "podcast"}},
+                    { link: "/shows", text: "Committee Shows", params: {filter: ["committee","radio"]}},
+                    { link: "/shows", text: "Current Radio shows", params: {filter: "current"}},
+                    { link: "/shows", text: "Archived Radio shows", params: {filter: ["archive","radio"]}},
                   ]}
               />
             </HScroll>

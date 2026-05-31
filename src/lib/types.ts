@@ -37,6 +37,17 @@ export type IShow = {
   photo: string | null,
 }
 
+export type IPodcast = {
+  id: number,
+  title: string,
+  description: string | null,
+  hosts: string[],
+  photo: string | null,
+  startDate: string,
+  endDate: string,
+  latestShow: string,
+}
+
 export type ShowEvent = {
   id: number,
   title: string,

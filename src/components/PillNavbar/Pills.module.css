@@ -23,6 +23,7 @@
     text-decoration: none;
     border-radius: 50px;
     outline: 1px solid rgb(255,255,255, 0.9);
+    background: #5d1f74;
 
     cursor: pointer;
     /*background-color: rgba(var(--background-rgb), 0.5);*/
